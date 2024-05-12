@@ -11,7 +11,7 @@ def hello_world():
 @app.route("/api/v1/prompt", methods=['POST'])
 def promt():
     if request.method == 'POST':
-        PROMPT = 'You as a assistant to Andrew Huberman, pick the vitamins or supplements that he suggests for the user asked input of'+request.form['promptdata']+'JUST MENTION THE SUPPLEMENT OR PROTEIN NOTHING ELSE.'
+        PROMPT = 'You as a assistant to Andrew Huberman, pick the vitamins or supplements that he suggests for the user asked input of'+request.form['promptdata']+'JUST MENTION THE SUPPLEMENT OR PROTEIN NOTHING ELSE. And return the output in a json format without tags on top and bottom'
         MODEL = 'gemini-pro'
         # print('** GenAI text: %r model & prompt %r\n' % (MODEL, PROMPT))
 
