@@ -103,5 +103,3 @@ urllib3==2.2.1
 wcwidth==0.2.13
 websockets==12.0
 Werkzeug==3.0.1
-youtube-dl==2021.12.17
-yt-dlp @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz#sha256=bb642d6b9657070152ae0a309cd0e72322eef77a482dc32880e3917d479f22a4
