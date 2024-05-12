@@ -46,32 +46,32 @@ def prompt():
 @api_bp.route('/searchtranscripts', methods=['GET'])
 def search_transcripts():
     '''
-    input:
-    {
-        'search_terms': ["vitamin", "whey"]
-    }
+    Endpoint to search transcripts by terms.
     '''
-    # ensure the search_terms field is in the request
-    data = request.get_json()
-    if not all(key in data for key in ['search_terms']):
-        abort(400, description="Missing data in request payload")
-    
-    search_terms = data['search_terms']
-    
-    
-    url: str = os.environ.get("SUPABASE_URL")
-    key: str = os.environ.get("SUPABASE_KEY")
-    supabase: Client = create_client(url, key)
-    # Query to find transcripts containing the word 'vitamin'
+    search_terms = request.args.getlist('search_terms')  # assuming multiple terms can be passed as list
+    logging.info(f"Search terms: {search_terms}")
+
+    url: str = "https://qdebnruvfqxnkpldyaha.supabase.co"
+    key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZWJucnV2ZnF4bmtwbGR5YWhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU0ODA0NDQsImV4cCI6MjAzMTA1NjQ0NH0.GMoI3J_CoUHgmrYowNQu_IyuPCnxGcM2iJwBaP6TRlQ"
+    supabase = create_client(url, key)
+
     query_result = []
-    for term in data['search_terms']:
-        query = f"select * from transcripts where text like '%{term}%';"
-        result_data = supabase.table("transcripts").execute_sql(query)
-        if result_data.error:
-            return jsonify({"error": str(data.error)}), 500
-        
-        query_result.append(result_data.data)
+    for term in search_terms:
+        try:
+            # Using the select method with a filter
+            # select all columns from the 'transcripts' table where the 'text' column contains the search term  
+            # result = supabase.table('transcripts').select().filter('text', 'ilike', f'%{term}%').execute()
+            
+            # do a sanity check to see if the transcripts table exists
+            #return the first 5 rows
+            result = supabase.table("transcripts").select("*").execute()
+
+            query_result.append(result.data)
+            
+            logging.info(f"Query result for term '{term}': {result.data}")
+        except Exception as e:
+            logging.error(f"Error querying the database: {e}")
+            abort(500, description="Failed to query the database")
 
     logging.info(f"Query result: {query_result}")
-
-    return jsonify(data.data), 200
+    return jsonify(query_result), 200
