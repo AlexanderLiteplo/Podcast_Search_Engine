@@ -1,21 +1,16 @@
 /** @format */
 "use client";
-import { FaChevronDown } from "react-icons/fa";
 import { useState, useEffect } from 'react';
 
-import Image from "next/image";
-import { FaArrowUp } from "react-icons/fa6";
-import { Result } from "postcss";
-
 export default function Home() {
-
   const [formData, setFormData] = useState({
-    // Initialize your form fields here
     promptdata: '',
   });
   const [postResult, setPostResult] = useState(null);
   const [getResult, setGetResult] = useState(null);
   const [error, setError] = useState(null);
+  const [loadingPost, setLoadingPost] = useState(false);
+  const [loadingGet, setLoadingGet] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -28,8 +23,8 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-
     try {
+      setLoadingPost(true);
       const response = await fetch('http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/prompt', {
         method: 'POST',
         headers: {
@@ -47,6 +42,8 @@ export default function Home() {
       setPostResult(result);
     } catch (error) {
       setError(error);
+    } finally {
+      setLoadingPost(false);
     }
   };
   
@@ -54,6 +51,8 @@ export default function Home() {
     const fetchData = async () => {
       try {
         if (!postResult) return;
+
+        setLoadingGet(true);
 
         // Construct the URL with parameter from the postResult
         const params = new URLSearchParams({
@@ -72,6 +71,8 @@ export default function Home() {
         setGetResult(data);
       } catch (error) {
         setError(error);
+      } finally {
+        setLoadingGet(false);
       }
     };
 
@@ -80,20 +81,20 @@ export default function Home() {
 
 
   return (
-    <div className="h-full flex flex-col justify-between gap-3 pb-5 ">
+    <div className="h-full flex flex-col justify-between">
       {/* nav */}
-      <button className="text-lg font-bold flex items-center gap-2  rounded-xl p-2 hover:bg-slate-800 transition-all w-fit ">
+      <button className="text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 transition-all w-fit m-auto">
         <p>Supplements</p>
       </button>
 
       {/* main */}
       <main className="flex flex-col items-center text-center justify-center gap-4">
-        <div className=" h-10 w-10 bg-white p-1 rounded-full">
+        <div className="h-10 w-10 bg-white p-1 rounded-full">
           <img src="/assets/ai-logo.svg" alt="" />
         </div>
 
         <p className="text-2xl font-semibold">What are you looking to buy today?</p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="w-full max-w-sm m-auto">
           <div className="flex relative">
             <input
               type="text"
@@ -104,24 +105,58 @@ export default function Home() {
             />
           </div>
 
-          <button type="submit" className="btn btn-blue">Search</button>
+          <button type="submit" className="btn btn-blue w-full mt-4">Search</button>
         </form>
       </main>
       {/* bottom section */}
       <section className="max-w-3xl mx-auto flex flex-col gap-5">
-        {error && <div>Error: {error.message}</div>}
-        {postResult && (
-          <div>
-            <h2>Post Result:</h2>
-            <pre>{JSON.stringify(postResult, null, 2)}</pre>
+      {loadingPost && (
+        <div className="bg-dark shadow-md rounded-lg p-6 mb-4 w-96 animate-pulse">
+          <div className="h-4 bg-gray-200 mb-3 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      )}
+
+      {postResult && (
+        <div className="bg-dark shadow-md rounded-lg p-6 mb-4 w-96">
+          <h2 className="text-lg font-semibold mb-4">Supplements or Proteins</h2>
+          <ul className="list-disc ml-6">
+            {postResult.result.split(', ').map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {loadingGet && (
+        <div className="bg-dark shadow-md rounded-lg p-6 mb-4 w-96 animate-pulse">
+          <div className="h-4 bg-gray-200 mb-3 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      )}
+
+      <div className="flex flex-wrap justify-center">
+        {getResult && getResult.slice(0, 3).map((item) => (
+          <div key={item.id} className="bg-dark shadow-md rounded-lg p-6 mb-4 mx-4 w-96">
+            <iframe
+              width="100%"
+              height="315"
+              src={item.link}
+              title={item.text}
+              frameBorder="0"
+              allowFullScreen
+              className="mb-4"
+            ></iframe>
+            <h2 className="text-lg font-semibold mb-2">{item.text}</h2>
           </div>
-        )}
-        {getResult && (
-          <div>
-            <h2>Get Result:</h2>
-            <pre>{JSON.stringify(getResult, null, 2)}</pre>
-          </div>
-        )}
+        ))}
+      </div>
+
+      {error && (
+        <div className="bg-red-200 text-red-900 shadow-md rounded-lg p-4 mb-4 w-96">
+          Error: {error.message}
+        </div>
+      )}
       </section>
     </div>
   );
