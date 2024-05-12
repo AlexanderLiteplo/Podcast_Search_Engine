@@ -87,35 +87,3 @@ export default function Sidebar({}: Props) {
     </div>
   );
 }
-
-function Timeline(props: Timeline) {
-  const pathName = usePathname();
-
-  console.log("pathName", pathName);
-
-  //
-  return (
-    <div className="w-full flex flex-col  ">
-      <p className="text-sm text-gray-500 font-bold p-2">{props.label}</p>
-
-      {props.timelines.map((d, i) => (
-        <Link
-          key={i}
-          className={cn(
-            "p-2 group ease-in-out duration-300 hover:bg-slate-800 rounded-lg transition-all items-center text-sm w-full flex justify-between  ",
-            { "bg-slate-800": `/${d.href}` === pathName }
-          )}
-          href={d.href}
-        >
-          <div className="text-ellipsis overflow-hidden w-[80%] whitespace-nowrap">
-            {d.title}
-          </div>
-          <div className="  transition-all items-center gap-2 hidden group-hover:flex ease-in-out duration-300 ">
-            <BsThreeDots />
-            <BsArchiveFill />
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
