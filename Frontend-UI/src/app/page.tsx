@@ -1,10 +1,11 @@
 /** @format */
 "use client";
 import { FaChevronDown } from "react-icons/fa";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Image from "next/image";
 import { FaArrowUp } from "react-icons/fa6";
+import { Result } from "postcss";
 
 export default function Home() {
 
@@ -12,10 +13,11 @@ export default function Home() {
     // Initialize your form fields here
     promptdata: '',
   });
+  const [postResult, setPostResult] = useState(null);
+  const [getResult, setGetResult] = useState(null);
+  const [error, setError] = useState(null);
 
-  const [apiResult, setApiResult] = useState(null);
-
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -23,17 +25,15 @@ export default function Home() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
 
     try {
       const response = await fetch('http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        //    {
-        //     "promptdata": "What does andrew huberman say about getting a cold?"
-        //    }
         },
         body: JSON.stringify(formData),
       });
@@ -43,33 +43,41 @@ export default function Home() {
       }
 
       // Handle success response
-      console.log('Data posted successfully');
       const result = await response.json();
-      setApiResult(result);
+      setPostResult(result);
     } catch (error) {
-      console.error('There was a problem with your fetch operation:', error);
+      setError(error);
     }
   };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!postResult) return;
 
-  // const [responseData, setResponseData] = useState(null);
-  // const [error, setError] = useState(null);
+        // Construct the URL with parameter from the postResult
+        const params = new URLSearchParams({
+          search_term: postResult.result,
+          // Add more parameters as needed
+        });
+        const url = `http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?${params.toString()}`;
 
-  // const fetchData = async (parameter) => {
-  //   try {
-  //     const response = await fetch(`guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?search_term=${parameter}`);
-      
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
 
-  //     const data = await response.json();
-  //     setResponseData(data);
-  //   } catch (error) {
-  //     setError(error);
-  //   }
-  // };
+        const data = await response.json();
+        setGetResult(data);
+      } catch (error) {
+        setError(error);
+      }
+    };
 
-  // fetchData(apiResult[1]);
+    fetchData();
+  }, [postResult]);
+
 
   return (
     <div className="h-full flex flex-col justify-between gap-3 pb-5 ">
@@ -101,10 +109,17 @@ export default function Home() {
       </main>
       {/* bottom section */}
       <section className="max-w-3xl mx-auto flex flex-col gap-5">
-        {apiResult && (
+        {error && <div>Error: {error.message}</div>}
+        {postResult && (
           <div>
-            <h2>API Result:</h2>
-            <pre>{JSON.stringify(apiResult, null, 2)}</pre>
+            <h2>Post Result:</h2>
+            <pre>{JSON.stringify(postResult, null, 2)}</pre>
+          </div>
+        )}
+        {getResult && (
+          <div>
+            <h2>Get Result:</h2>
+            <pre>{JSON.stringify(getResult, null, 2)}</pre>
           </div>
         )}
       </section>
