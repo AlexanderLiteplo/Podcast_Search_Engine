@@ -57,7 +57,7 @@ export default function Home() {
 
         // Construct the URL with parameter from the postResult
         const params = new URLSearchParams({
-          search_term: postResult.result,
+          search_term: postResult.result[1],
           // Add more parameters as needed
         });
         const url = `http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?${params.toString()}`;
