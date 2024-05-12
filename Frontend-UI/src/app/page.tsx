@@ -3,11 +3,20 @@
 import { useState, useEffect } from 'react';
 
 export default function Home() {
+
+  // Define an interface for the API response data
+  interface ApiResponse {
+    id: number;
+    link: string;
+    start: number;
+    text: string;
+  }
+
   const [formData, setFormData] = useState({
     promptdata: '',
   });
-  const [postResult, setPostResult] = useState(null);
-  const [getResult, setGetResult] = useState(null);
+  const [postResult, setPostResult] = useState<{ result: string } | null>(null);
+  const [getResult, setGetResult] = useState<ApiResponse[] | null>(null);
   const [error, setError] = useState(null);
   const [loadingPost, setLoadingPost] = useState(false);
   const [loadingGet, setLoadingGet] = useState(false);
@@ -41,7 +50,7 @@ export default function Home() {
       const result = await response.json();
       setPostResult(result);
     } catch (error) {
-      setError(error);
+      //setError(error as Error);
     } finally {
       setLoadingPost(false);
     }
@@ -54,9 +63,12 @@ export default function Home() {
 
         setLoadingGet(true);
 
+        // Split the postResult.result string and get the first word
+        const searchTerm = postResult.result.split(',')[0].trim();
+
         // Construct the URL with parameter from the postResult
         const params = new URLSearchParams({
-          search_term: postResult.result[1],
+          search_term: searchTerm,
           // Add more parameters as needed
         });
         const url = `http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?${params.toString()}`;
@@ -69,8 +81,9 @@ export default function Home() {
 
         const data = await response.json();
         setGetResult(data);
+        console.log(data);
       } catch (error) {
-        setError(error);
+        // setError(error);
       } finally {
         setLoadingGet(false);
       }
@@ -105,7 +118,7 @@ export default function Home() {
             />
           </div>
 
-          <button type="submit" className="btn btn-blue w-full mt-4">Search</button>
+          <button type="submit" className="text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 transition-all w-fit m-auto">Search</button>
         </form>
       </main>
       {/* bottom section */}
@@ -138,25 +151,28 @@ export default function Home() {
       <div className="flex flex-wrap justify-center">
         {getResult && getResult.slice(0, 3).map((item) => (
           <div key={item.id} className="bg-dark shadow-md rounded-lg p-6 mb-4 mx-4 w-96">
-            <iframe
-              width="100%"
-              height="315"
-              src={item.link}
-              title={item.text}
-              frameBorder="0"
-              allowFullScreen
-              className="mb-4"
-            ></iframe>
+            <a href={item.link+"&t="+item.start} target="_blank" rel="noopener noreferrer">
+              <iframe
+                width="100%"
+                height="315"
+                src={item.link+"&t="+item.start}
+                title={item.text}
+                frameBorder="0"
+                allowFullScreen
+                className="mb-4"
+              ></iframe>
+            </a>
+            <a href={item.link+"&t="+item.start} target="_blank" rel="noopener noreferrer" className='text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 transition-all w-fit m-auto'>View Video</a>
             <h2 className="text-lg font-semibold mb-2">{item.text}</h2>
           </div>
         ))}
       </div>
 
-      {error && (
+      {/* {error && (
         <div className="bg-red-200 text-red-900 shadow-md rounded-lg p-4 mb-4 w-96">
           Error: {error.message}
         </div>
-      )}
+      )} */}
       </section>
     </div>
   );
