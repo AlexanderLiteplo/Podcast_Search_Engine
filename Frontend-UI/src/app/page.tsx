@@ -34,7 +34,7 @@ export default function Home() {
 
     try {
       setLoadingPost(true);
-      const response = await fetch('http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/prompt', {
+      const response = await fetch('https://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function Home() {
           search_term: searchTerm,
           // Add more parameters as needed
         });
-        const url = `http://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?${params.toString()}`;
+        const url = `https://guruguru.eba-pjgbgb57.us-west-2.elasticbeanstalk.com/api/searchtranscripts?${params.toString()}`;
 
         const response = await fetch(url);
         
