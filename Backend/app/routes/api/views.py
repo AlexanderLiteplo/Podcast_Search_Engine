@@ -39,6 +39,9 @@ def prompt():
                  Another example: 
                  User input: What supplements should I take if I have a cold?
                  Your output: treating cold, flu supplements, cold remedies, reducing cold symptoms
+                 Another example:
+                 User input: What does Andrew Huberman say about sauna?
+                 Your output: sauna, sauna duration, sauna benefits, sauna time, sauna protocols, minutes in sauna
                  Another example: 
                  User input: How long should I sauna for?
                  Your output: sauna benefits, sauna time, sauna protocols, minutes in sauna

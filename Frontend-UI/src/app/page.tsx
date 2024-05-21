@@ -1,14 +1,16 @@
 /** @format */
 "use client";
 import { useState, useEffect } from "react";
+import React from 'react';
+import YouTubePlayer from './youtubePlayer'; // Update this path as needed
 
 export default function Home() {
   // Define an interface for the API response data
   interface ApiResponse {
-    id: number;
+    id: string;
     link: string;
-    start: number;
-    text: string;
+    queryTerm: string;
+    timestamps: { start: number; text: string }[];
   }
 
   const [formData, setFormData] = useState({
@@ -19,7 +21,6 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [loadingPost, setLoadingPost] = useState(false);
   const [loadingGet, setLoadingGet] = useState(false);
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,7 +73,7 @@ export default function Home() {
           // Add more parameters as needed
         });
         const url = `https://api.askhealth.guru/api/searchtranscripts?${params.toString()}`;
-        
+
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -81,12 +82,34 @@ export default function Home() {
 
         const data = await response.json();
         // for all of the start times, turn them into integers
-        data.forEach((item: ApiResponse) => {
+        data.forEach((item: any) => {
           item.start = parseInt(item.start.toString());
         });
-        setGetResult(data);
-        console.log(data);
+        // log the length of the data
+        console.log("Old length of the data" + data.length);
+        // Group the results by the video ID
+        const getResults = data.reduce((acc: any, item: any) => {
+          const id = item.link.split("v=")[1].split("&")[0];
+          const existing = acc.find((result: any) => result.id === id);
 
+          if (existing) {
+            existing.timestamps.push({ start: item.start, text: item.text });
+          } else {
+            acc.push({
+              id: id,
+              link: item.link,
+              queryTerm: searchTerm,
+              timestamps: [{ start: item.start, text: item.text }],
+            });
+          }
+
+          return acc;
+        }, []);
+        
+        setGetResult(getResults);
+        // log the new length of the data
+        console.log("New length" + getResults.length);
+        // console.log(getResults);
       } catch (error) {
         // setError(error);
       } finally {
@@ -96,6 +119,53 @@ export default function Home() {
 
     fetchData();
   }, [postResult]);
+
+
+  class ErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+  
+    static getDerivedStateFromError(error) {
+      return { hasError: true };
+    }
+  
+    componentDidCatch(error, errorInfo) {
+      // Log error information to an error reporting service
+      console.error("Error in component: ", error, errorInfo);
+    }
+  
+    render() {
+      if (this.state.hasError) {
+        // Render any fallback UI
+        return <h1>Something went wrong.</h1>;
+      }
+  
+      return this.props.children; 
+    }
+  }
+
+  const renderYouTubeVideo = (item: ApiResponse) => {
+    const buttons = item.timestamps.map((timestamp) => ({
+      text: timestamp.text,
+      start: timestamp.start,
+    }));
+
+    //log all info for debugging
+    console.log("In Page.tsx: Rendering YouTube Video");
+    console.log(item.id);
+    console.log(item.queryTerm);
+    console.log('buttons: ', buttons);
+
+    return (
+      <div key={item.id}>
+        <ErrorBoundary>
+          <YouTubePlayer vidId={item.id} queryTerm={item.queryTerm} buttons={buttons} />
+        </ErrorBoundary>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -111,17 +181,11 @@ export default function Home() {
 
           {postResult && (
             <div className="flex flex-col justify-center w-full">
-              {" "}
-              {/* Parent container with Flexbox for horizontal centering */}
               <div className="bg-dark shadow-md rounded-lg p-6 mb-4 w-96 mx-auto">
-                {" "}
-                {/* Centered content block */}
                 <h2 className="text-lg font-semibold mb-4">
                   Searching podcast for:
                 </h2>
                 <ul className="list-disc ml-6 text-left">
-                  {" "}
-                  {/* Text alignment can be controlled here */}
                   {postResult.result.split(", ").map((item, index) => (
                     <li key={index}>{item}</li>
                   ))}
@@ -129,51 +193,15 @@ export default function Home() {
               </div>
             </div>
           )}
-
           {loadingGet && (
             <div className="bg-dark shadow-md rounded-lg p-6 mb-4 w-96 animate-pulse">
               <div className="h-4 bg-gray-200 mb-3 rounded w-3/4"></div>
               <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
           )}
-
-<div className="flex flex-wrap justify-center">
-  {getResult &&
-    getResult.slice(0, 3).map((item) => {
-      // Extract video ID from the URL
-      const videoId = item.link.split('v=')[1].split('&')[0];
-      // Add a unique parameter to the embed URL to prevent caching issues
-      const uniqueParam = `&t=${new Date().getTime()}`;
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?start=${item.start}${uniqueParam}`;
-
-      return (
-        <div
-          key={item.id}
-          className="bg-dark shadow-md rounded-lg p-6 mb-4 mx-4"
-          style={{ width: '800px' }} // Double the current width
-        >
-          <iframe
-            width="800"  // Double the width
-            height="450" // Double the height to maintain 16:9 ratio
-            src={embedUrl}
-            title={item.text}
-            frameBorder="0"
-            allowFullScreen
-            className="mb-4"
-          ></iframe>
-          <a
-            href={embedUrl} // Link to view the video might still use item.link directly if needed
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 transition-all w-fit m-auto"
-          >
-            View Video
-          </a>
-          <h2 className="text-lg font-semibold mb-2">{item.text}</h2>
-        </div>
-      );
-    })}
-</div>
+          <div className="flex flex-wrap justify-center">
+            {getResult && getResult.map(renderYouTubeVideo)}
+          </div>
         </div>
       </section>
 
