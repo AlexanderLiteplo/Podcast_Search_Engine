@@ -239,7 +239,7 @@ export default function Home() {
               <input
                 type="text"
                 name="promptdata"
-                placeholder="Where does Andrew talk about Sauna?"
+                placeholder="Vitamin C, Sauna, etc."
                 onChange={handleChange}
                 className="w-full h-12 bg-inherit rounded-xl border border-gray-500 px-4"
               />
