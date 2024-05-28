@@ -33,7 +33,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         if (firstScriptTag && firstScriptTag.parentNode) {
           firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         }
-        
+
         window.onYouTubeIframeAPIReady = initializePlayer;
       } else {
         initializePlayer();
@@ -72,6 +72,12 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     }
   };
 
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };  
+
   return (
     <div className="bg-white shadow-2xl rounded-lg overflow-hidden max-w-3xl w-full mb-4">
       <div className="p-4 text-center bg-gray-100">
@@ -93,7 +99,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
                 onClick={() => setCurrentTime(button.start)}
                 className="self-start px-4 py-1 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-full hover:from-green-600 hover:to-blue-600 transition duration-300 transform hover:scale-105"
               >
-                {button.text}
+              {formatTime(button.start) + " - " + button.text + "..."}
               </button>
             ))}
           </div>
