@@ -122,27 +122,22 @@ export default function Home() {
 
 
   class ErrorBoundary extends React.Component {
-    constructor(props) {
+    constructor(props: any) {
       super(props);
       this.state = { hasError: false };
     }
   
-    static getDerivedStateFromError(error) {
+    static getDerivedStateFromError(error: any) {
       return { hasError: true };
     }
   
-    componentDidCatch(error, errorInfo) {
+    componentDidCatch(error: any, errorInfo: any) {
       // Log error information to an error reporting service
       console.error("Error in component: ", error, errorInfo);
     }
   
     render() {
-      if (this.state.hasError) {
-        // Render any fallback UI
-        return <h1>Something went wrong.</h1>;
-      }
-  
-      return this.props.children; 
+      return this.props.children as React.ReactNode; 
     }
   }
 
