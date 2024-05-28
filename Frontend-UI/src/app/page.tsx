@@ -51,7 +51,7 @@ export default function Home() {
       const result = await response.json();
       setPostResult(result);
     } catch (error) {
-      //setError(error as Error);
+      // setError(error as Error);
     } finally {
       setLoadingPost(false);
     }
@@ -62,8 +62,8 @@ export default function Home() {
       if (!window.YT) {
         const tag = document.createElement("script");
         tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName("script")[0];''
-        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+        const firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
       }
     };
 
@@ -118,7 +118,7 @@ export default function Home() {
 
           return acc;
         }, []);
-        
+
         setGetResult(getResults);
         // log the new length of the data
         console.log("New length" + getResults.length);
@@ -133,35 +133,37 @@ export default function Home() {
     fetchData();
   }, [postResult]);
 
-
   interface ErrorBoundaryProps {
     children: React.ReactNode;
   }
-  
+
   interface ErrorBoundaryState {
     hasError: boolean;
   }
-  
-  class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+
+  class ErrorBoundary extends React.Component<
+    ErrorBoundaryProps,
+    ErrorBoundaryState
+  > {
     constructor(props: ErrorBoundaryProps) {
       super(props);
       this.state = { hasError: false };
     }
-  
+
     static getDerivedStateFromError(error: any) {
       return { hasError: true };
     }
-  
+
     componentDidCatch(error: any, errorInfo: any) {
       // Log error information to an error reporting service
       console.error("Error in component: ", error, errorInfo);
     }
-  
+
     render() {
       if (this.state.hasError) {
         return <h1>Something went wrong.</h1>;
       }
-  
+
       return this.props.children;
     }
   }
@@ -172,11 +174,11 @@ export default function Home() {
       start: timestamp.start,
     }));
 
-    //log all info for debugging
+    // log all info for debugging
     console.log("In Page.tsx: Rendering YouTube Video");
     console.log(item.id);
     console.log(item.queryTerm);
-    console.log('buttons: ', buttons);
+    console.log("buttons: ", buttons);
 
     return (
       <div key={item.id}>
@@ -226,12 +228,12 @@ export default function Home() {
       </section>
 
       {/* Search bar section */}
-      <main className="bg-white shadow-lg p-4 sticky bottom-0">
+      <main className="bg-white dark:bg-gray-800 shadow-lg p-4 sticky bottom-0">
         <div className="flex flex-col items-center text-center justify-center gap-4">
-          <div className="h-10 w-10 bg-white p-1 rounded-full">
+          <div className="h-10 w-10 bg-white dark:bg-gray-800 p-1 rounded-full">
             <img src="/assets/ai-logo.svg" alt="AI Logo" />
           </div>
-          <p className="text-2xl font-semibold">
+          <p className="text-2xl font-semibold dark:text-white">
             Search the Huberman Lab podcast for information.
           </p>
           <form onSubmit={handleSubmit} className="w-full max-w-sm m-auto">
@@ -241,11 +243,11 @@ export default function Home() {
                 name="promptdata"
                 placeholder="Vitamin C, Sauna, etc."
                 onChange={handleChange}
-                className="w-full h-12 bg-inherit rounded-xl border border-gray-500 px-4"
+                className="w-full h-12 bg-inherit dark:bg-gray-700 dark:text-white rounded-xl border border-gray-500 px-4"
               />
               <button
                 type="submit"
-                className="text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 transition-all w-fit m-auto"
+                className="text-lg font-bold flex items-center gap-2 rounded-xl p-2 hover:bg-blue-500 dark:hover:bg-blue-700 transition-all w-fit m-auto dark:text-white"
               >
                 Search
               </button>
