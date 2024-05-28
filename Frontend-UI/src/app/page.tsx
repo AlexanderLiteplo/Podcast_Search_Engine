@@ -58,6 +58,19 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const loadYouTubeAPI = () => {
+      if (!window.YT) {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName("script")[0];''
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+      }
+    };
+
+    loadYouTubeAPI();
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         if (!postResult) return;
@@ -121,8 +134,16 @@ export default function Home() {
   }, [postResult]);
 
 
-  class ErrorBoundary extends React.Component {
-    constructor(props: any) {
+  interface ErrorBoundaryProps {
+    children: React.ReactNode;
+  }
+  
+  interface ErrorBoundaryState {
+    hasError: boolean;
+  }
+  
+  class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+    constructor(props: ErrorBoundaryProps) {
       super(props);
       this.state = { hasError: false };
     }
@@ -137,7 +158,11 @@ export default function Home() {
     }
   
     render() {
-      return this.props.children as React.ReactNode; 
+      if (this.state.hasError) {
+        return <h1>Something went wrong.</h1>;
+      }
+  
+      return this.props.children;
     }
   }
 
