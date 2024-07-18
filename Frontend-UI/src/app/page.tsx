@@ -35,7 +35,7 @@ export default function Home() {
 
     try {
       setLoadingPost(true);
-      const response = await fetch("https://api.askhealth.guru/api/prompt", {
+      const response = await fetch("http://localhost:5000/api/prompt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export default function Home() {
           search_term: searchTerm,
           // Add more parameters as needed
         });
-        const url = `https://api.askhealth.guru/api/searchtranscripts?${params.toString()}`;
+        const url = `http://localhost:5000/api/searchtranscripts?${params.toString()}`;
 
         const response = await fetch(url);
 
