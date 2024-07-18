@@ -2,6 +2,12 @@
 
 Our goal is to make information retrieval from podcasts quick and easy. Instead of listening to an entire episode, users can search all podcast episodes for any subjects or terms. Our interface will pull up the exact episodes and timestamps where the term or subject is mentioned. By clicking on the timestamps, the podcast will begin playing from that point.
 
+### UI Preview
+
+Here’s a preview of the user interface:
+
+![Podcast Search Interface](./images/ui.png)
+
 ### Frontend Setup
 
 1. Navigate to the Frontend directory:
